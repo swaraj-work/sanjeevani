@@ -104,7 +104,7 @@ export default function Home() {
     return (
         <Layout>
         <Head>
-        <title>Sanjeevani Workshop - Rediscovering Health, Harmony & the Vedic Way of Living</title>
+        <title>Sanjeevani Workshop - The Vedic Way of Living</title>
         <meta name="description" content="Join renowned Ayurvedic expert Vaidya Rajesh Kapoor for a 2-day immersive journey into self-healing, lifestyle transformation, and ancient Indian wisdom." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         <link rel="icon" href="/favicon.ico" />

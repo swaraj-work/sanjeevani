@@ -24,12 +24,22 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Deploying Only the Frontend (Static Export)
 
-To learn more about Next.js, take a look at the following resources:
+To export and deploy only the frontend as static HTML (for shared/static hosting):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+1. **Build and Export the App**
+
+    ```sh
+    npm run build
+    ```
+
+    This will generate a folder called `out/` in your project root.
+
+2. **Deploy**
+   Upload the contents of the `out/` directory to your web host's public directory (e.g., `public_html`).
+
+---
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 

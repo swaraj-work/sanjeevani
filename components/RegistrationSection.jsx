@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { sendConfirmationEmail } from '../utils/emailService';
 
 const RegistrationSection = () => {
   const [formData, setFormData] = useState({
@@ -11,57 +12,148 @@ const RegistrationSection = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const messageRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const scrollToMessage = () => {
+    messageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  const verifyPayment = async (response, formData) => {
+    try {
+      console.log('Verifying payment:', response);
+
+      const res = await fetch('http://localhost:8000/verify-payment.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+          formData
+        }),
+      });
+
+      const data = await res.json();
+      console.log('Verification response:', data);
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Payment verification failed');
+      }
+      
+      // Send confirmation email
+      try {
+        await sendConfirmationEmail(formData, {
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id
+        });
+        console.log('Confirmation email sent successfully');
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Continue with success flow even if email fails
+      }
+
+      setMessageType('success');
+      setPaymentMessage('Registration successful! You will receive a confirmation email shortly.');
+      scrollToMessage();
+      setIsSubmitting(false);
+      return true;
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      setMessageType('error');
+      setPaymentMessage('Payment verification failed. Please contact support if payment was deducted.');
+      scrollToMessage();
+      setIsSubmitting(false);
+      return false;
+    }
+  };
+
   const loadRazorpay = () => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
       document.body.appendChild(script);
+      script.onload = () => resolve(true);
+      script.onerror = () => {
+        document.body.removeChild(script);
+        resolve(false);
+      };
     });
   };
 
   const handlePayment = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setPaymentMessage('');
 
     // Validation
     if (!formData.name || !formData.email || !formData.phone) {
-      alert('Please fill in all required fields.');
+      setMessageType('error');
+      setPaymentMessage('Please fill in all required fields.');
       setIsSubmitting(false);
+      scrollToMessage();
       return;
     }
 
     try {
+      console.log('Creating order with form data:', formData);
+
+      // Create order first
+      const orderRes = await fetch('http://localhost:8000/create-order.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ formData }),
+      });
+
+      if (!orderRes.ok) {
+        const errorText = await orderRes.text();
+        console.error('Order creation error response:', errorText);
+        throw new Error('Failed to create order');
+      }
+
+      const orderData = await orderRes.json();
+      console.log('Order created:', orderData);
+
+      if (!orderData.orderId) {
+        console.error('Invalid order data:', orderData);
+        throw new Error('Invalid order data received');
+      }
+
+      // Load Razorpay
       const res = await loadRazorpay();
       if (!res) {
+        setMessageType('error');
         setPaymentMessage('Payment gateway could not be loaded. Please try again later.');
         console.error('Razorpay SDK failed to load');
         setIsSubmitting(false);
+        scrollToMessage();
         return;
       }
 
-      // In a real implementation, you'd make an API call to your backend to create an order
-      // For demo purposes, we'll show a success message
-      setPaymentMessage('Demo registration successful! In production, payment would be processed.');
+      console.log('Razorpay object available:', !!window.Razorpay);
 
-      // If you want to test the actual Razorpay integration, uncomment this code
-      /*
       const options = {
-        key: "rzp_test_YourTestKey", // Replace with your test key
-        amount: 99900, // Amount in paise (₹999)
-        currency: "INR",
+        // key: "rzp_live_1j9gDh1eamAJx7", // Using the live key directly
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount || 100, // ₹1 in paise for testing
+        currency: orderData.currency || "INR",
         name: "Sanjeevani Workshop",
-        description: "Registration Fee",
-        image: "/images/logo.png", // Replace with your logo
-        handler: function(response) {
-          setPaymentMessage(`Payment Successful! Payment ID: ${response.razorpay_payment_id}`);
+        description: "Workshop Registration Fee",
+        order_id: orderData.orderId,
+        handler: async function (response) {
+          console.log('Payment successful:', response);
+          await verifyPayment(response, formData);
+          // Ensure state is reset even if verifyPayment doesn't complete properly
+          setIsSubmitting(false);
         },
         prefill: {
           name: formData.name,
@@ -72,19 +164,56 @@ const RegistrationSection = () => {
           accommodation: formData.accommodation
         },
         theme: {
-          color: "#8B5A2B"
+          color: "#4B6F44"
+        },
+        modal: {
+          ondismiss: function () {
+            console.log('Checkout form closed by user');
+            setIsSubmitting(false);
+            // Optionally add a message that payment was canceled
+            setMessageType('error');
+            setPaymentMessage('Payment process was canceled. Please try again if you wish to register.');
+            scrollToMessage();
+          }
         }
       };
 
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
-      */
-    } catch (error) {
-      setPaymentMessage('An error occurred. Please try again.');
-      console.error(error);
-    }
+      console.log('Razorpay options:', options);
 
-    setIsSubmitting(false);
+      try {
+        const paymentObject = new window.Razorpay(options);
+        
+        // Handle payment failure
+        paymentObject.on('payment.failed', function (response) {
+          console.error('Payment failed:', response.error);
+          setMessageType('error');
+          setPaymentMessage(`Payment failed: ${response.error?.description || 'Unknown error'}`);
+          setIsSubmitting(false);
+          scrollToMessage();
+        });
+        
+        // Reset state when modal is closed without completing payment
+        paymentObject.on('modal.closed', function() {
+          console.log('Payment modal closed without completion');
+          setIsSubmitting(false);
+        });
+        
+        paymentObject.open();
+      } catch (err) {
+        console.error('Razorpay initialization error:', err);
+        setMessageType('error');
+        setPaymentMessage(`Payment gateway error: ${err.message}`);
+        setIsSubmitting(false);
+        scrollToMessage();
+      }
+
+    } catch (error) {
+      console.error('Payment process error:', error);
+      setMessageType('error');
+      setPaymentMessage(`An error occurred: ${error.message}`);
+      scrollToMessage();
+      setIsSubmitting(false);
+    }
   };
 
   const fadeIn = {
@@ -138,46 +267,60 @@ const RegistrationSection = () => {
               whileInView="visible"
               viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
-              className="lg:col-span-7 bg-white rounded-2xl shadow-lg border border-neutral-100 overflow-hidden"
+              className="lg:col-span-7 bg-white rounded-2xl shadow-lg border border-neutral-100 overflow-hidden h-full"
             >
               <div className="bg-primary/5 p-6 border-b border-neutral-100">
                 <h3 className="text-2xl font-bold text-primary text-center">Register Now</h3>
+                <p className="text-center mt-2 text-neutral-600">Registration Fee: ₹1</p>
               </div>
 
-              <div className="p-6 md:p-8">
+              <div className="p-6 md:p-8 lg:p-10 min-h-[650px] flex flex-col">
                 {paymentMessage && (
                   <motion.div
+                    ref={messageRef}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 p-4 bg-green-50 text-green-700 rounded-lg border border-green-100 flex items-start"
+                    className={`mb-6 p-4 rounded-lg border flex items-start ${messageType === 'success'
+                      ? 'bg-green-50 text-green-700 border-green-100'
+                      : 'bg-red-50 text-red-700 border-red-100'
+                      }`}
                   >
-                    <svg className="w-5 h-5 mr-3 mt-0.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <svg
+                      className={`w-5 h-5 mr-3 mt-0.5 ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      {messageType === 'success' ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      )}
                     </svg>
                     <span>{paymentMessage}</span>
                   </motion.div>
                 )}
 
-                <form onSubmit={handlePayment} className="space-y-6">
-                  <motion.div variants={fadeIn}>
-                    <label htmlFor="name" className="block text-sm font-medium text-neutral-800 mb-1.5">
-                      Full Name*
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
-                      placeholder="Your full name"
-                      required
-                    />
-                  </motion.div>
+                <form onSubmit={handlePayment} className="flex flex-col h-full justify-between">
+                  <div className="space-y-10">
+                                      <motion.div variants={fadeIn} className="space-y-1">
+                      <label htmlFor="name" className="block text-sm font-medium text-neutral-800 mb-2">
+                        Full Name*
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full px-5 py-4 text-base border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-neutral-50 hover:bg-white"
+                        placeholder="Your full name"
+                        required
+                      />
+                    </motion.div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <motion.div variants={fadeIn}>
-                      <label htmlFor="email" className="block text-sm font-medium text-neutral-800 mb-1.5">
+                                      <motion.div variants={fadeIn} className="space-y-1">
+                      <label htmlFor="email" className="block text-sm font-medium text-neutral-800 mb-2">
                         Email Address*
                       </label>
                       <input
@@ -186,14 +329,14 @@ const RegistrationSection = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full px-5 py-4 text-base border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-neutral-50 hover:bg-white"
                         placeholder="your.email@example.com"
                         required
                       />
                     </motion.div>
 
-                    <motion.div variants={fadeIn}>
-                      <label htmlFor="phone" className="block text-sm font-medium text-neutral-800 mb-1.5">
+                    <motion.div variants={fadeIn} className="space-y-1">
+                      <label htmlFor="phone" className="block text-sm font-medium text-neutral-800 mb-2">
                         Phone Number*
                       </label>
                       <input
@@ -202,51 +345,50 @@ const RegistrationSection = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full px-5 py-4 text-base border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-neutral-50 hover:bg-white"
                         placeholder="+91 98765 43210"
                         required
                       />
                     </motion.div>
-                  </div>
 
-                  <motion.div variants={fadeIn}>
-                    <label className="block text-sm font-medium text-neutral-800 mb-2">
-                      Accommodation Preference*
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <label className="flex items-center bg-neutral-50 px-4 py-3 rounded-lg border border-neutral-300 cursor-pointer transition-all hover:bg-neutral-100">
-                        <input
-                          type="radio"
-                          name="accommodation"
-                          value="yes"
-                          checked={formData.accommodation === 'yes'}
-                          onChange={handleChange}
-                          className="mr-3 text-primary focus:ring-primary h-4 w-4"
-                        />
-                        <div>
-                          <span className="text-neutral-800 font-medium">Twin sharing</span>
-                          <p className="text-xs text-neutral-500 mt-0.5">Includes accommodation</p>
-                        </div>
+                                      <motion.div variants={fadeIn} className="space-y-2">
+                      <label className="block text-sm font-medium text-neutral-800 mb-3">
+                        Accommodation Preference*
                       </label>
-                      <label className="flex items-center bg-neutral-50 px-4 py-3 rounded-lg border border-neutral-300 cursor-pointer transition-all hover:bg-neutral-100">
-                        <input
-                          type="radio"
-                          name="accommodation"
-                          value="no"
-                          checked={formData.accommodation === 'no'}
-                          onChange={handleChange}
-                          className="mr-3 text-primary focus:ring-primary h-4 w-4"
-                        />
-                        <div>
-                          <span className="text-neutral-800 font-medium">Self-arranged</span>
-                          <p className="text-xs text-neutral-500 mt-0.5">No accommodation needed</p>
-                        </div>
-                      </label>
-                    </div>
-                  </motion.div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label className="flex items-center bg-neutral-50 px-5 py-4 rounded-lg border border-neutral-300 cursor-pointer transition-all hover:bg-white hover:border-primary/50">
+                          <input
+                            type="radio"
+                            name="accommodation"
+                            value="yes"
+                            checked={formData.accommodation === 'yes'}
+                            onChange={handleChange}
+                            className="mr-3 text-primary focus:ring-primary h-5 w-5"
+                          />
+                          <div>
+                            <span className="text-neutral-800 font-medium">Twin sharing</span>
+                            <p className="text-sm text-neutral-500 mt-0.5">Includes accommodation</p>
+                          </div>
+                        </label>
+                        <label className="flex items-center bg-neutral-50 px-5 py-4 rounded-lg border border-neutral-300 cursor-pointer transition-all hover:bg-white hover:border-primary/50">
+                          <input
+                            type="radio"
+                            name="accommodation"
+                            value="no"
+                            checked={formData.accommodation === 'no'}
+                            onChange={handleChange}
+                            className="mr-3 text-primary focus:ring-primary h-5 w-5"
+                          />
+                          <div>
+                            <span className="text-neutral-800 font-medium">Self-arranged</span>
+                            <p className="text-sm text-neutral-500 mt-0.5">No accommodation needed</p>
+                          </div>
+                        </label>
+                      </div>
+                    </motion.div>
 
-                  <motion.div variants={fadeIn}>
-                    <label htmlFor="message" className="block text-sm font-medium text-neutral-800 mb-1.5">
+                  <motion.div variants={fadeIn} className="space-y-1">
+                    <label htmlFor="message" className="block text-sm font-medium text-neutral-800 mb-2">
                       Special Requirements (Optional)
                     </label>
                     <textarea
@@ -254,51 +396,33 @@ const RegistrationSection = () => {
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      rows={3}
-                      className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                      rows={5}
+                      className="w-full px-5 py-4 text-base border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-neutral-50 hover:bg-white"
                       placeholder="Any dietary restrictions, accessibility needs, or other requirements?"
                     ></textarea>
                   </motion.div>
 
-                  <motion.div variants={fadeIn} className="pt-2">
-                    <div className="bg-accent/10 border border-accent/20 rounded-lg p-5 mb-6">
-                      <div className="flex items-start">
-                        <div className="bg-accent/20 rounded-full p-2 mr-4 mt-1">
-                          <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-neutral-800 mb-1">Reservation Fee: ₹999 only</h4>
-                          <p className="text-sm text-neutral-700 leading-relaxed">
-                            <span className="font-medium">₹999 secures your seat</span> and grants you access to our private participant group, where exclusive discounts and offers will be revealed.
-                          </p>
-                          <p className="text-sm text-neutral-700 mt-2 font-medium">→ Balance payment payable later.</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <motion.button
+                  </div>
+                  
+                  <motion.div variants={fadeIn} className="mt-10 md:mt-20">
+                    <button
                       type="submit"
                       disabled={isSubmitting}
-                      className={`w-full py-4 px-6 bg-primary text-white rounded-lg font-medium text-base sm:text-lg transition-all shadow-md hover:shadow-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary/90'}`}
-                      whileHover={!isSubmitting ? { scale: 1.02 } : {}}
-                      whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+                      className={`w-full btn-primary flex items-center justify-center py-4 text-lg ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+                        }`}
                     >
                       {isSubmitting ? (
-                        <span className="flex items-center justify-center">
+                        <>
                           <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
                           Processing...
-                        </span>
-                      ) : 'Reserve Your Spot Now'}
-                    </motion.button>
-
-                    <p className="text-xs text-neutral-500 text-center mt-4">
-                      Limited to 50 participants | By Eligibility | By Intention
-                    </p>
+                        </>
+                      ) : (
+                        <>Pay Rs 1 & Block Your Seat for Exclusive Discounts</>
+                      )}
+                    </button>
                   </motion.div>
                 </form>
               </div>
@@ -313,7 +437,7 @@ const RegistrationSection = () => {
               whileInView="visible"
               viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
-              className="lg:col-span-5 space-y-8"
+              className="lg:col-span-5 space-y-8 flex flex-col justify-between"
             >
               <motion.div variants={fadeIn} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-neutral-100">
                 <div className="bg-primary/5 p-5 border-b border-neutral-100">
@@ -452,22 +576,7 @@ const RegistrationSection = () => {
 
                   <div className="mt-6 pt-4 border-t border-neutral-100">
                     <p className="text-sm text-neutral-600 leading-relaxed">
-                      <span className="font-medium">Note:</span> The reservation fee of ₹999 secures your seat and grants access to our private participant group. This amount will be adjusted in your final payment. Balance due 14 days before the event. Travel expenses not included.
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-              <motion.div variants={fadeIn} className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-primary/10 rounded-full p-2">
-                    <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-medium text-neutral-800">Have questions?</h4>
-                    <p className="text-neutral-700 mt-1 text-sm">
-                      Call us at <a href="tel:+919876543210" className="text-primary font-medium hover:underline">+91 98765 43210</a> or email <a href="mailto:info@sanjeevaniworkshop.com" className="text-primary font-medium hover:underline">info@sanjeevaniworkshop.com</a>
+                      <span className="font-medium">Note:</span> The reservation fee of ₹1 secures your seat and grants access to our private participant group. This amount will be adjusted in your final payment. Balance due 14 days before the event. Travel expenses not included.
                     </p>
                   </div>
                 </div>

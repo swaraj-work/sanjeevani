@@ -1,0 +1,8 @@
+{
+    "name": "sanjeevani/website",
+    "description": "Sanjeevani website with PHP backend",
+    "require": {
+        "razorpay/razorpay": "^2.0",
+        "vlucas/phpdotenv": "^5.5"
+    }
+}

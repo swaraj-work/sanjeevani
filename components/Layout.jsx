@@ -15,7 +15,7 @@ const Header = () => {
             setIsScrolled(scrollPosition > 50);
 
             // Determine active section based on scroll position
-            const sections = ['about', 'schedule', 'speakers', 'venue', 'registration'];
+            const sections = ['about', 'schedule', 'guides', 'venue', 'registration'];
 
             for (const section of sections) {
                 const element = document.getElementById(section);
@@ -70,13 +70,11 @@ const Header = () => {
                                 transition={{ delay: 0.2, duration: 0.5 }}
                                 className="relative"
                             >
-                                Sanjeevani
-                                <motion.span
-                                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"
-                                    initial={{ scaleX: 0 }}
-                                    animate={{ scaleX: 1 }}
-                                    transition={{ delay: 0.5, duration: 0.5 }}
-                                ></motion.span>
+                                <img 
+                                    src="/images/logo.png" 
+                                    alt="Sanjeevani Logo" 
+                                    className="h-10 w-auto"
+                                />
                             </motion.span>
                         </span>
                     </Link>
@@ -88,8 +86,8 @@ const Header = () => {
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Toggle menu"
                         className={`focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md p-2 transition-colors ${isMenuOpen
-                                ? 'bg-primary text-white'
-                                : 'text-primary hover:bg-primary/5'
+                            ? 'bg-primary text-white'
+                            : 'text-primary hover:bg-primary/5'
                             }`}
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +104,7 @@ const Header = () => {
                     {[
                         { name: 'About', href: '#about', id: 'about' },
                         { name: 'Schedule', href: '#schedule', id: 'schedule' },
-                        { name: 'Speakers', href: '#speakers', id: 'speakers' },
+                        { name: 'Guides', href: '#speakers', id: 'guides' },
                         { name: 'Venue', href: '#venue', id: 'venue' },
                         { name: 'Registration', href: '#registration', id: 'registration' }
                     ].map((item) => {
@@ -177,7 +175,13 @@ const Header = () => {
                             className="fixed top-0 right-0 bottom-0 w-4/5 max-w-sm bg-white shadow-xl z-20 md:hidden flex flex-col"
                         >
                             <div className="flex justify-between items-center p-5 border-b border-neutral-100">
-                                <span className="text-xl font-bold text-primary">Menu</span>
+                                <span className="text-xl font-bold text-primary flex items-center">
+                                    <img 
+                                        src="/images/logo.png" 
+                                        alt="Sanjeevani Logo" 
+                                        className="h-8 w-auto"
+                                    />
+                                </span>
                                 <button
                                     onClick={() => setIsMenuOpen(false)}
                                     className="p-2 rounded-full hover:bg-neutral-100 text-neutral-500 focus:outline-none"
@@ -193,7 +197,7 @@ const Header = () => {
                                     {[
                                         { name: 'About', href: '#about', id: 'about', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
                                         { name: 'Schedule', href: '#schedule', id: 'schedule', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-                                        { name: 'Speakers', href: '#speakers', id: 'speakers', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+                                        { name: 'Guides', href: '#speakers', id: 'guides', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
                                         { name: 'Venue', href: '#venue', id: 'venue', icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z' },
                                         { name: 'Registration', href: '#registration', id: 'registration', icon: 'M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4' }
                                     ].map((item) => {
@@ -252,14 +256,18 @@ const Footer = () => {
         <footer className="bg-gradient-to-b from-neutral-800 to-neutral-900 text-white pt-16 pb-8">
             <div className="container-custom">
                 {/* Main Footer Content */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-y-10 gap-x-8 pb-12">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-y-10 gap-x-[100px] pb-12">
                     {/* Brand Column */}
                     <div className="md:col-span-4 space-y-6">
-                        <div className="flex items-center space-x-3">
-                            <h3 className="text-2xl font-bold text-white">Sanjeevani</h3>
+                        <div className="flex items-center space-x-3 ml-5">
+                            <img 
+                                src="/images/logo-light.png" 
+                                alt="Sanjeevani Logo" 
+                                className="h-10 w-auto scale-[1.5]"
+                            />
                         </div>
 
-                        <p className="text-gray-300 leading-relaxed">
+                        <p className="text-gray-300 leading-relaxed mt-4">
                             Follow the Path of Sanjeevani. Return not just healthier, but transformed through the ancient wisdom of Ayurveda and holistic wellness.
                         </p>
 
@@ -290,7 +298,7 @@ const Footer = () => {
                             Quick Links
                         </h4>
                         <ul className="space-y-3">
-                            {['About', 'Schedule', 'Speakers', 'Venue', 'Registration'].map((item) => (
+                            {['About', 'Schedule', 'Guides', 'Venue', 'Registration'].map((item) => (
                                 <li key={item}>
                                     <a
                                         href={`#${item.toLowerCase()}`}
@@ -332,7 +340,7 @@ const Footer = () => {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium">Email</p>
-                                    <a href="mailto:info@sanjeevaniworkshop.com" className="text-gray-300 hover:text-accent transition-colors">info@sanjeevaniworkshop.com</a>
+                                    <a href="mailto:info@sanjeevaniworkshop.com" className="text-gray-300 hover:text-accent transition-colors">mail2movingworld@gmail.com</a>
                                 </div>
                             </li>
                             <li className="flex items-start">
@@ -343,7 +351,7 @@ const Footer = () => {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium">Phone</p>
-                                    <a href="tel:+919876543210" className="text-gray-300 hover:text-accent transition-colors">+91 98765 43210</a>
+                                    <a href="tel:+919876543210" className="text-gray-300 hover:text-accent transition-colors">+91 85100-17177</a>
                                 </div>
                             </li>
                         </ul>
