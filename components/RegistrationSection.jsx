@@ -106,7 +106,6 @@ const RegistrationSection = () => {
       console.log('Creating order with form data:', formData);
 
       // Create order first
-      // const orderRes = await fetch('http://localhost:8000/create-order.php', {
       const orderRes = await fetch('https://sanjeevani-backend-qnpf.onrender.com/create-order.php', {
         method: 'POST',
         headers: {
