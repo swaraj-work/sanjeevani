@@ -28,7 +28,8 @@ const RegistrationSection = () => {
     try {
       console.log('Verifying payment:', response);
 
-      const res = await fetch('http://localhost:8000/verify-payment.php', {
+      // const res = await fetch('http://localhost:8000/verify-payment.php', {
+      const res = await fetch('https://sanjeevani-backend-qnpf.onrender.com/verify-payment.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +107,8 @@ const RegistrationSection = () => {
       console.log('Creating order with form data:', formData);
 
       // Create order first
-      const orderRes = await fetch('http://localhost:8000/create-order.php', {
+      // const orderRes = await fetch('http://localhost:8000/create-order.php', {
+      const orderRes = await fetch('https://sanjeevani-backend-qnpf.onrender.com/create-order.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
