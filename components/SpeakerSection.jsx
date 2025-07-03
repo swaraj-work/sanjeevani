@@ -97,7 +97,7 @@ const SpeakerSection = () => {
                     >
                         <div className="relative z-10 overflow-hidden rounded-xl">
                             {/* Carousel Container */}
-                            <div className="relative h-[200px] md:h-[500px] overflow-hidden rounded-xl">
+                            <div className="relative h-[300px] md:h-[500px] sm:h-[400px] overflow-hidden rounded-xl">
                                 {speakerImages.map((src, index) => (
                                     <div
                                         key={index}
