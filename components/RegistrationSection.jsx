@@ -44,8 +44,11 @@ const RegistrationSection = () => {
       const data = await res.json();
       console.log('Verification response:', data);
 
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Payment verification failed');
+      // Check for errors in response
+      if (!res.ok || data.success === false) {
+        const errorMessage = data.error || data.message || 'Payment verification failed';
+        console.error('Verification error:', errorMessage);
+        throw new Error(errorMessage);
       }
       
       // Send confirmation email
@@ -60,18 +63,11 @@ const RegistrationSection = () => {
         // Continue with success flow even if email fails
       }
 
-      setMessageType('success');
-      setPaymentMessage('Registration successful! You will receive a confirmation email shortly.');
-      scrollToMessage();
-      setIsSubmitting(false);
+      // Return true for successful verification
       return true;
     } catch (error) {
       console.error('Payment verification error:', error);
-      setMessageType('error');
-      setPaymentMessage('Payment verification failed. Please contact support if payment was deducted.');
-      scrollToMessage();
-      setIsSubmitting(false);
-      return false;
+      throw error; // Rethrow to be handled by the caller
     }
   };
 
@@ -114,18 +110,18 @@ const RegistrationSection = () => {
         body: JSON.stringify({ formData }),
       });
 
-      if (!orderRes.ok) {
-        const errorText = await orderRes.text();
-        console.error('Order creation error response:', errorText);
-        throw new Error('Failed to create order');
-      }
-
       const orderData = await orderRes.json();
-      console.log('Order created:', orderData);
+      console.log('Order created response:', orderData);
+
+      if (!orderRes.ok || orderData.success === false) {
+        const errorMessage = orderData.message || orderData.error || 'Failed to create order';
+        console.error('Order creation failed:', errorMessage);
+        throw new Error(errorMessage);
+      }
 
       if (!orderData.orderId) {
         console.error('Invalid order data:', orderData);
-        throw new Error('Invalid order data received');
+        throw new Error('Invalid order data received - missing orderId');
       }
 
       // Load Razorpay
@@ -142,18 +138,35 @@ const RegistrationSection = () => {
       console.log('Razorpay object available:', !!window.Razorpay);
 
       const options = {
-        // key: "rzp_live_1j9gDh1eamAJx7", // Using the live key directly
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount || 100, // ₹1 in paise for testing
         currency: orderData.currency || "INR",
         name: "Sanjeevani Workshop",
         description: "Workshop Registration Fee",
         order_id: orderData.orderId,
-        handler: async function (response) {
+        handler: function (response) {
           console.log('Payment successful:', response);
-          await verifyPayment(response, formData);
-          // Ensure state is reset even if verifyPayment doesn't complete properly
-          setIsSubmitting(false);
+          
+          // Don't use await here - it causes issues with Razorpay modal
+          // Instead, handle the verification response separately
+          setMessageType('info');
+          setPaymentMessage('Processing your payment. Please wait...');
+          scrollToMessage();
+          
+          verifyPayment(response, formData).then(success => {
+            if (success) {
+              setMessageType('success');
+              setPaymentMessage('Registration successful! You will receive a confirmation email shortly.');
+              scrollToMessage();
+            }
+            setIsSubmitting(false);
+          }).catch(error => {
+            console.error("Verification error:", error);
+            setMessageType('error');
+            setPaymentMessage(`Payment verification failed: ${error.message || 'Unknown error'}. Please contact support.`);
+            scrollToMessage();
+            setIsSubmitting(false);
+          });
         },
         prefill: {
           name: formData.name,
@@ -170,11 +183,15 @@ const RegistrationSection = () => {
           ondismiss: function () {
             console.log('Checkout form closed by user');
             setIsSubmitting(false);
-            // Optionally add a message that payment was canceled
-            setMessageType('error');
-            setPaymentMessage('Payment process was canceled. Please try again if you wish to register.');
-            scrollToMessage();
-          }
+            // Only show message if no other message is showing (avoid overriding success/error messages)
+            if (!paymentMessage) {
+              setMessageType('error');
+              setPaymentMessage('Payment process was canceled. Please try again if you wish to register.');
+              scrollToMessage();
+            }
+          },
+          escape: true,
+          animation: true
         }
       };
 

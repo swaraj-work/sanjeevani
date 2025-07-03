@@ -1,3 +1,5 @@
+# Sanjeevani Workshop Website
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
 ## Getting Started
@@ -48,3 +50,39 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+
+## Environment Variables Setup
+
+### Vercel (Frontend)
+
+You need to set up the following environment variables in your Vercel project settings:
+
+1. `NEXT_PUBLIC_RAZORPAY_KEY_ID` - Your Razorpay public key ID
+2. `NEXT_PUBLIC_EMAILJS_USER_ID` - Your EmailJS user ID
+3. `USE_PHP_BACKEND` - Set to 'true' to use the PHP backend on Render, or 'false' to use the Next.js API
+
+To add these environment variables in Vercel:
+1. Go to your Vercel project dashboard
+2. Click on "Settings"
+3. Select "Environment Variables"
+4. Add each variable and its value
+5. Deploy your project again to apply the changes
+
+### Render.com (Backend)
+
+You need to set up the following environment variables in your Render.com backend:
+
+1. `RAZORPAY_KEY_SECRET` - Your Razorpay secret key
+2. `RAZORPAY_KEY_ID` - Your Razorpay key ID
+3. Other PHP backend specific variables
+
+To add these environment variables in Render:
+1. Go to your Render dashboard
+2. Select your backend service
+3. Click on "Environment"
+4. Add each key-value pair
+5. Click "Save Changes" and your service will restart
+
+## CORS Configuration
+
+This project has CORS configured for API routes. The middleware and API configuration ensure proper handling of cross-origin requests.

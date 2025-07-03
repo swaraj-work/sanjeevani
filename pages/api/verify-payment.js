@@ -20,14 +20,28 @@ export default async function handler(req, res) {
                 body: JSON.stringify(req.body),
             });
 
-            if (!response.ok) {
-                throw new Error(`Backend returned ${response.status}: ${await response.text()}`);
+            let data;
+            try {
+                data = await response.json();
+            } catch (e) {
+                console.error('Error parsing response from PHP backend:', e);
+                // If can't parse JSON, return text
+                const textData = await response.text();
+                return res.status(response.status).json({ 
+                    success: false,
+                    message: 'Invalid JSON response from backend', 
+                    rawResponse: textData
+                });
             }
 
-            const data = await response.json();
-            return res.status(200).json(data);
+            // Ensure response has success field
+            if (!data.hasOwnProperty('success')) {
+                data.success = response.ok;
+            }
+
+            return res.status(response.ok ? 200 : 400).json(data);
         } else {
-            // Get the payment details from the request body
+            // Local verification logic
             const {
                 razorpay_payment_id,
                 razorpay_order_id,
@@ -43,7 +57,10 @@ export default async function handler(req, res) {
                 .digest("hex");
 
             if (razorpay_signature !== expectedSign) {
-                return res.status(400).json({ message: 'Invalid payment signature' });
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Invalid payment signature' 
+                });
             }
 
             // Initialize Razorpay instance to verify payment
@@ -60,11 +77,17 @@ export default async function handler(req, res) {
 
             // Verify payment amount matches order amount
             if (payment.amount !== order.amount) {
-                return res.status(400).json({ message: 'Payment amount does not match order amount' });
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Payment amount does not match order amount' 
+                });
             }
 
             if (payment.status !== 'captured') {
-                return res.status(400).json({ message: 'Payment not captured' });
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Payment not captured' 
+                });
             }
 
             // Here you would typically store the registration in your database
@@ -77,9 +100,6 @@ export default async function handler(req, res) {
                 createdAt: new Date(),
             };
 
-            // TODO: Add your database logic here
-            // await db.collection('registrations').add(registrationData);
-
             return res.status(200).json({
                 success: true,
                 message: 'Payment verified successfully',
@@ -89,6 +109,7 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('Payment verification error:', error);
         return res.status(500).json({
+            success: false,
             message: 'Error verifying payment',
             error: error.message
         });
