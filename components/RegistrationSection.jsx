@@ -28,7 +28,6 @@ const RegistrationSection = () => {
     try {
       console.log('Verifying payment:', response);
 
-      // const res = await fetch('http://localhost:8000/verify-payment.php', {
       const res = await fetch('https://sanjeevani-backend-qnpf.onrender.com/verify-payment.php', {
         method: 'POST',
         headers: {
