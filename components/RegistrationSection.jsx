@@ -28,7 +28,7 @@ const RegistrationSection = () => {
     try {
       console.log('Verifying payment:', response);
 
-      const res = await fetch('/api/verify-payment', {
+      const res = await fetch('/api/verify-payment.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ const RegistrationSection = () => {
       console.log('Creating order with form data:', formData);
 
       // Create order first
-      const orderRes = await fetch('/api/create-order', {
+      const orderRes = await fetch('/api/create-order.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
