@@ -424,7 +424,7 @@ const Footer = () => {
                             Organised By
                         </h4>
                         <div className="flex flex-col">
-                            <div className="bg-white p-3 rounded-lg shadow-lg w-36 h-36 flex items-center justify-center mb-4 p-0">
+                            <div className="bg-white rounded-lg shadow-lg w-36 h-36 flex items-center justify-center mb-4 p-0">
                                 <img
                                     src="/images/moving-world.jpg"
                                     alt="Moving World Logo"
