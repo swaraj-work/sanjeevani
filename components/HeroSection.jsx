@@ -31,8 +31,8 @@ const HeroSection = () => {
 
   return (
     <section
-      className="relative min-h-[95vh] flex items-center justify-center text-white overflow-hidden bg-[#e7e6db] w-full"
-      id="hero"
+      className="relative min-h-screen flex items-center justify-center text-white overflow-hidden bg-[#e7e6db] w-full"
+      id="home"
     >
       {/* Background image with overlay */}
       <div
@@ -115,20 +115,6 @@ const HeroSection = () => {
           </motion.a>
         </motion.div>
       </motion.div>
-
-      <div className="absolute bottom-10 left-0 right-0 text-center z-10">
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-          className="cursor-pointer"
-        >
-          <a href="#about" aria-label="Scroll down">
-            <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-            </svg>
-          </a>
-        </motion.div>
-      </div>
 
       {/* Decorative element */}
       <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-black/20 to-transparent"></div>

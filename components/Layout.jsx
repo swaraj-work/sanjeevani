@@ -15,12 +15,18 @@ const Header = () => {
             setIsScrolled(scrollPosition > 50);
 
             // Determine active section based on scroll position
-            const sections = ['about', 'schedule', 'speakers', 'venue', 'registration'];
+            const sections = ['home', 'about', 'schedule', 'speakers', 'venue', 'registration'];
             let currentSection = '';
 
-            // If we're at the top of the page
+            // If we're at the top of the page (hero section)
             if (window.scrollY < 100) {
-                setActiveSection('');
+                setActiveSection('home');
+                // Update URL hash to #home when at top
+                if (window.location.hash !== '#home') {
+                    if (history.replaceState) {
+                        history.replaceState(null, null, '#home');
+                    }
+                }
                 return;
             }
 
@@ -46,11 +52,22 @@ const Header = () => {
 
             if (currentSection && currentSection !== activeSection) {
                 setActiveSection(currentSection);
+                // Update URL hash when section changes
+                if (window.location.hash !== `#${currentSection}`) {
+                    if (history.replaceState) {
+                        history.replaceState(null, null, `#${currentSection}`);
+                    }
+                }
             }
         };
 
-        // Initial check
-        handleScroll();
+        // Initial check and hash detection
+        const initialHash = window.location.hash.replace('#', '');
+        if (initialHash && ['home', 'about', 'schedule', 'speakers', 'venue', 'registration'].includes(initialHash)) {
+            setActiveSection(initialHash);
+        } else {
+            handleScroll();
+        }
         
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -63,14 +80,22 @@ const Header = () => {
         setActiveSection(section);
         
         // Smooth scroll to section
-        const element = document.getElementById(section);
-        if (element) {
-            const offset = 100; // Account for fixed navbar
-            const elementPosition = element.offsetTop - offset;
+        if (section === 'home') {
+            // For home section, scroll to top
             window.scrollTo({
-                top: elementPosition,
+                top: 0,
                 behavior: 'smooth'
             });
+        } else {
+            const element = document.getElementById(section);
+            if (element) {
+                const offset = 100; // Account for fixed navbar
+                const elementPosition = element.offsetTop - offset + 60; 
+                window.scrollTo({
+                    top: elementPosition,
+                    behavior: 'smooth'
+                });
+            }
         }
     };
 
@@ -125,6 +150,7 @@ const Header = () => {
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
                     {[
+                        { name: 'Home', href: '#home', id: 'home' },
                         { name: 'About', href: '#about', id: 'about' },
                         { name: 'Schedule', href: '#schedule', id: 'schedule' },
                         { name: 'Speakers', href: '#speakers', id: 'speakers' },
@@ -226,6 +252,7 @@ const Header = () => {
                             <div className="py-5 px-2 flex-1 overflow-y-auto">
                                 <ul className="space-y-1">
                                     {[
+                                        { name: 'Home', href: '#home', id: 'home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
                                         { name: 'About', href: '#about', id: 'about', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
                                         { name: 'Schedule', href: '#schedule', id: 'schedule', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
                                         { name: 'Speakers', href: '#speakers', id: 'speakers', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
@@ -305,7 +332,7 @@ const Footer = () => {
 
                         <div className="flex space-x-4 pt-2">
                             {[
-                                { name: 'facebook', icon: 'M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.588157385z', url: '' },
+                                { name: 'facebook', icon: 'M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.588157385z', url: 'https://www.facebook.com/people/Movin-W/pfbid02uEeEcjJzV4JECvM8tPeqtL1mjqChJT2YC5tF5nx4aPcih9RS7DSYAhB1NFF8qJPDl/?mibextid=wwXIfr&rdid=bU5DIHrpo2CGwmpg&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F193Hb75Sof%2F%3Fmibextid%3DwwXIfr' },
                                 { name: 'instagram', icon: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z', url: 'https://www.instagram.com/movingworld_official/' },
                                 // { name: 'x', icon: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z', url: '#'},
                                 { name: 'linkedin', icon: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z', url: 'https://www.linkedin.com/in/moving-world-355975370/'}
@@ -315,6 +342,8 @@ const Footer = () => {
                                     href={item.url}
                                     className="w-9 h-9 rounded-full bg-neutral-700 hover:bg-accent flex items-center justify-center transition-colors duration-300"
                                     aria-label={item.name}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path d={item.icon} />
