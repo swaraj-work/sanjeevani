@@ -107,21 +107,21 @@ export default function Home() {
                 <title>Sanjeevani Workshop - The Vedic Way of Living</title>
                 <meta name="description" content="Join renowned Ayurvedic expert Vaidya Rajesh Kapoor for a 2-day immersive journey into self-healing, lifestyle transformation, and ancient Indian wisdom." />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon.png" />
 
                 {/* Open Graph / Facebook */}
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://sanjeevaniworkshop.com/" />
                 <meta property="og:title" content="Sanjeevani Workshop - Rediscovering Vedic Wellness" />
                 <meta property="og:description" content="A Transformational Wellness Retreat with Vaidya Rajesh Kapoor" />
-                <meta property="og:image" content="/images/og-image.jpg" />
+                {/* <meta property="og:image" content="/images/og-image.jpg" /> */}
 
                 {/* Twitter */}
                 <meta property="twitter:card" content="summary_large_image" />
                 <meta property="twitter:url" content="https://sanjeevaniworkshop.com/" />
                 <meta property="twitter:title" content="Sanjeevani Workshop - Rediscovering Vedic Wellness" />
                 <meta property="twitter:description" content="A Transformational Wellness Retreat with Vaidya Rajesh Kapoor" />
-                <meta property="twitter:image" content="/images/og-image.jpg" />
+                {/* <meta property="twitter:image" content="/images/og-image.jpg" /> */}
             </Head>
 
             <div className="w-full overflow-x-hidden">

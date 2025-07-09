@@ -73,15 +73,12 @@ const Header = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [activeSection]);
 
-    // Close mobile menu when section is clicked
     const handleNavClick = (sectionId) => {
         setIsMenuOpen(false);
         const section = sectionId.replace('#', '');
         setActiveSection(section);
         
-        // Smooth scroll to section
         if (section === 'home') {
-            // For home section, scroll to top
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
@@ -89,7 +86,7 @@ const Header = () => {
         } else {
             const element = document.getElementById(section);
             if (element) {
-                const offset = 100; // Account for fixed navbar
+                const offset = 100;
                 const elementPosition = element.offsetTop - offset + 60; 
                 window.scrollTo({
                     top: elementPosition,
@@ -101,7 +98,7 @@ const Header = () => {
 
     return (
         <header
-            className={`fixed top-0 w-full z-50 transition-all duration-500 bg-white shadow-sm ${isScrolled ? 'py-2' : 'py-4'}`}
+            className={`fixed top-0 w-full z-50 transition-all duration-500 bg-white ${isScrolled ? 'py-2' : 'py-4'} shadow-xl`}
         >
             <div className="container-custom flex justify-between items-center">
                 <motion.div
