@@ -57,7 +57,7 @@ const ScheduleSection = () => {
           className="text-center mb-16"
         >
           <span className="text-accent font-semibold uppercase tracking-wider text-sm mb-3 block">Program</span>
-          <h2 className="heading-lg text-primary mb-4">Workshop Schedule</h2>
+          <h2 className="heading-lg text-primary mb-4">Retreat Schedule</h2>
           <p className="text-lg text-neutral-600 max-w-3xl mx-auto">
             A carefully crafted journey through ancient wisdom and modern healing practices
           </p>

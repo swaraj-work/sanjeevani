@@ -139,7 +139,7 @@ const RegistrationSection = () => {
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: orderData.amount || 100, // ₹1 in paise for testing
+        amount: orderData.amount || 19900,
         currency: orderData.currency || "INR",
         name: "Sanjeevani Workshop",
         description: "Workshop Registration Fee",
@@ -288,7 +288,7 @@ const RegistrationSection = () => {
             >
               <div className="bg-primary/5 p-6 border-b border-neutral-100">
                 <h3 className="text-2xl font-bold text-primary text-center">Register Now</h3>
-                <p className="text-center mt-2 text-neutral-600">Registration Fee: ₹1</p>
+                <p className="text-center mt-2 text-neutral-600">Registration Fee: ₹199</p>
               </div>
 
               <div className="p-6 md:p-8 lg:p-10 min-h-[650px] flex flex-col">
@@ -437,7 +437,7 @@ const RegistrationSection = () => {
                           Processing...
                         </>
                       ) : (
-                        <>Pay Rs 1 & Block Your Seat for Exclusive Discounts</>
+                        <>Pay Rs 199 & Block Your Seat for Exclusive Discounts</>
                       )}
                     </button>
                   </motion.div>
@@ -593,7 +593,7 @@ const RegistrationSection = () => {
 
                   <div className="mt-6 pt-4 border-t border-neutral-100">
                     <p className="text-sm text-neutral-600 leading-relaxed">
-                      <span className="font-medium">Note:</span> The reservation fee of ₹1 secures your seat and grants access to our private participant group. This amount will be adjusted in your final payment. Balance due 14 days before the event. Travel expenses not included.
+                      <span className="font-medium">Note:</span> The reservation fee of ₹199 secures your seat and grants access to our private participant group. This amount will be adjusted in your final payment. Balance due 14 days before the event. Travel expenses not included.
                     </p>
                   </div>
                 </div>

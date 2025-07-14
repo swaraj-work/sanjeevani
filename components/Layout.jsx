@@ -473,7 +473,7 @@ const Layout = ({ children }) => {
                 <title>Sanjeevani - Rediscovering Health, Harmony & the Vedic Way of Living</title>
                 <meta name="description" content="A Transformational Wellness Retreat with Vaidya Rajesh Kapoor" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon.png" />
             </Head>
 
             <div className="overflow-x-hidden w-full">

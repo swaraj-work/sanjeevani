@@ -53,7 +53,7 @@ if (!$email) {
 }
 
 // Set order amount (in paise - ₹1 = 100 paise for testing)
-$amount = 100;
+$amount = 19900;
 $currency = "INR";
 
 try {

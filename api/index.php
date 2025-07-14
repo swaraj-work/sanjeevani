@@ -33,7 +33,7 @@ $docs = [
             ],
             'response' => [
                 'orderId' => 'Razorpay Order ID',
-                'amount' => 'Amount in paise (e.g., 99900 for ₹999)',
+                'amount' => 'Amount in paise (e.g., 19900 for ₹199)',
                 'currency' => 'Currency code (e.g., INR)',
                 'receipt' => 'Receipt ID',
                 'status' => 'Order status'
