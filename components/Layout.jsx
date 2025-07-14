@@ -446,20 +446,6 @@ const Footer = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Footer Bottom */}
-                <div className="pt-6 sm:pt-8 border-t border-neutral-700">
-                    <div className="flex flex-col sm:flex-row justify-between items-center">
-                        <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-0 text-center sm:text-left">
-                            &copy; {new Date().getFullYear()} Sanjeevani Workshop. All rights reserved.
-                        </p>
-                        <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6">
-                            <a href="#" className="text-gray-400 hover:text-accent text-xs sm:text-sm transition-colors">Privacy Policy</a>
-                            <a href="#" className="text-gray-400 hover:text-accent text-xs sm:text-sm transition-colors">Terms of Service</a>
-                            <a href="#" className="text-gray-400 hover:text-accent text-xs sm:text-sm transition-colors">FAQ</a>
-                        </div>
-                    </div>
-                </div>
             </div>
         </footer>
     );
