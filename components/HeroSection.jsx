@@ -7,10 +7,10 @@ const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const images = [
-    "/images/heroCrousel/vaidya-rajesh.jpg",
-    "/images/heroCrousel/Crousel2.jpg",
-    "/images/heroCrousel/Crousel3.jpg",
-    "/images/heroCrousel/Crousel4.jpg"
+    "/images/vaidya-rajesh.jpg",
+    "/images/Crousel2.jpg",
+    "/images/Crousel3.jpg",
+    "/images/Crousel4.jpg"
   ];
 
   useEffect(() => {
