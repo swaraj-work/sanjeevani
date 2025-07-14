@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { sendConfirmationEmail } from '../utils/emailService';
+import { FaPhone } from 'react-icons/fa6';
 
 const RegistrationSection = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ const RegistrationSection = () => {
   const [paymentMessage, setPaymentMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
   const messageRef = useRef(null);
+  const [showGuidelines, setShowGuidelines] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +53,7 @@ const RegistrationSection = () => {
         console.error('Verification error:', errorMessage);
         throw new Error(errorMessage);
       }
-      
+
       // Send confirmation email
       try {
         await sendConfirmationEmail(formData, {
@@ -84,10 +87,8 @@ const RegistrationSection = () => {
     });
   };
 
-  const handlePayment = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setPaymentMessage('');
 
     // Validation
     if (!formData.name || !formData.email || !formData.phone) {
@@ -97,6 +98,14 @@ const RegistrationSection = () => {
       scrollToMessage();
       return;
     }
+
+    // Show guidelines instead of proceeding directly to payment
+    setShowGuidelines(true);
+  };
+
+  const handlePayment = async () => {
+    setIsSubmitting(true);
+    setPaymentMessage('');
 
     try {
       console.log('Creating order with form data:', formData);
@@ -146,13 +155,13 @@ const RegistrationSection = () => {
         order_id: orderData.orderId,
         handler: function (response) {
           console.log('Payment successful:', response);
-          
+
           // Don't use await here - it causes issues with Razorpay modal
           // Instead, handle the verification response separately
           setMessageType('info');
           setPaymentMessage('Processing your payment. Please wait...');
           scrollToMessage();
-          
+
           verifyPayment(response, formData).then(success => {
             if (success) {
               setMessageType('success');
@@ -160,6 +169,8 @@ const RegistrationSection = () => {
               scrollToMessage();
             }
             setIsSubmitting(false);
+            setShowGuidelines(false);
+            setTermsAccepted(false);
           }).catch(error => {
             console.error("Verification error:", error);
             setMessageType('error');
@@ -199,7 +210,7 @@ const RegistrationSection = () => {
 
       try {
         const paymentObject = new window.Razorpay(options);
-        
+
         // Handle payment failure
         paymentObject.on('payment.failed', function (response) {
           console.error('Payment failed:', response.error);
@@ -208,13 +219,13 @@ const RegistrationSection = () => {
           setIsSubmitting(false);
           scrollToMessage();
         });
-        
+
         // Reset state when modal is closed without completing payment
-        paymentObject.on('modal.closed', function() {
+        paymentObject.on('modal.closed', function () {
           console.log('Payment modal closed without completion');
           setIsSubmitting(false);
         });
-        
+
         paymentObject.open();
       } catch (err) {
         console.error('Razorpay initialization error:', err);
@@ -318,9 +329,9 @@ const RegistrationSection = () => {
                   </motion.div>
                 )}
 
-                <form onSubmit={handlePayment} className="flex flex-col h-full justify-between">
+                <form onSubmit={handleFormSubmit} className="flex flex-col h-full justify-between">
                   <div className="space-y-10">
-                                      <motion.div variants={fadeIn} className="space-y-1">
+                    <motion.div variants={fadeIn} className="space-y-1">
                       <label htmlFor="name" className="block text-sm font-medium text-neutral-800 mb-2">
                         Full Name*
                       </label>
@@ -336,7 +347,7 @@ const RegistrationSection = () => {
                       />
                     </motion.div>
 
-                                      <motion.div variants={fadeIn} className="space-y-1">
+                    <motion.div variants={fadeIn} className="space-y-1">
                       <label htmlFor="email" className="block text-sm font-medium text-neutral-800 mb-2">
                         Email Address*
                       </label>
@@ -368,7 +379,7 @@ const RegistrationSection = () => {
                       />
                     </motion.div>
 
-                                      <motion.div variants={fadeIn} className="space-y-2">
+                    <motion.div variants={fadeIn} className="space-y-2">
                       <label className="block text-sm font-medium text-neutral-800 mb-3">
                         Accommodation Preference*
                       </label>
@@ -404,23 +415,23 @@ const RegistrationSection = () => {
                       </div>
                     </motion.div>
 
-                  <motion.div variants={fadeIn} className="space-y-1">
-                    <label htmlFor="message" className="block text-sm font-medium text-neutral-800 mb-2">
-                      Special Requirements (Optional)
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      rows={5}
-                      className="w-full px-5 py-4 text-base border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-neutral-50 hover:bg-white"
-                      placeholder="Any dietary restrictions, accessibility needs, or other requirements?"
-                    ></textarea>
-                  </motion.div>
+                    <motion.div variants={fadeIn} className="space-y-1">
+                      <label htmlFor="message" className="block text-sm font-medium text-neutral-800 mb-2">
+                        Special Requirements (Optional)
+                      </label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        rows={5}
+                        className="w-full px-5 py-4 text-base border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-neutral-50 hover:bg-white"
+                        placeholder="Any dietary restrictions, accessibility needs, or other requirements?"
+                      ></textarea>
+                    </motion.div>
 
                   </div>
-                  
+
                   <motion.div variants={fadeIn} className="mt-10 md:mt-20">
                     <button
                       type="submit"
@@ -442,6 +453,206 @@ const RegistrationSection = () => {
                     </button>
                   </motion.div>
                 </form>
+
+                {/* Guidelines Section */}
+                {showGuidelines && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="fixed mt-10 inset-0 bg-black bg-opacity-60 h-screen w-screen flex items-center justify-center p-0 sm:p-4 z-50 overflow-y-hidden"
+                  >
+                    <div className="bg-white mx-5 mb-5 rounded-lg sm:rounded-2xl shadow-xl w-full sm:max-w-3xl sm:my-8 h-[85vh] sm:h-auto sm:max-h-[85vh] overflow-hidden flex flex-col">
+                      <div className="bg-secondary p-3 sm:p-4 md:p-6 sticky top-0 z-10 border-b border-secondary/20 shrink-0">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">Important Guidelines</h3>
+                        <p className="text-white/80 text-center mt-1 sm:mt-2 text-2xs sm:text-xs md:text-sm">
+                          <span className="font-medium">Madhav Srishti Parisar, Ashwani Khad, Mandir Road, Solan, Himachal Pradesh</span><br />
+                          <span>🗓 October 10–12, 2025</span>
+                        </p>
+                      </div>
+
+                      <div className="custom-scrollbar overflow-y-auto flex-grow">
+                        <div className="p-3 sm:p-4 md:p-6">
+                          <div className="prose max-w-none">
+                            <p className="text-xs sm:text-sm md:text-base text-neutral-700 leading-relaxed mb-3 sm:mb-4 md:mb-6">
+                              Welcome to Sanjeevani — a transformative Vedic wellness shivir guided by Vaidya Rajesh Kapoor.
+                              This retreat is an immersive experience in natural healing, yogic discipline, and sattvic living.
+                              Please read the following carefully to ensure a meaningful and harmonious stay.
+                            </p>
+
+                            <div className="space-y-2 sm:space-y-3 md:space-y-5">
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                  <span className="bg-secondary text-white p-0.5 rounded-full w-2 h-2 sm:w-2 sm:h-2 md:w-3 md:h-3 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs"></span>
+                                  General Guidelines
+                                </h4>
+                                <ul className="list-disc pl-5 sm:pl-6 md:pl-8 text-neutral-700 space-y-0.5 sm:space-y-1 md:space-y-2 text-2xs sm:text-xs md:text-sm">
+                                  <li>This is a spiritual wellness shivir rooted in Indian and Vedic traditions. Please honor the sanctity of the space.</li>
+                                  <li>Participants opting for the arranged transport must arrive at Solan Bus Stop by 12:00 PM on October 10.</li>
+                                  <li>Local transportation will be arranged to and from the venue on October 10 and 12.</li>
+                                  <li>Participants travelling by personal vehicle are encouraged. Ample safe parking is available on-site.</li>
+                                </ul>
+                              </div>
+
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                <span className="bg-secondary text-white p-0.5 rounded-full w-2 h-2 sm:w-2 sm:h-2 md:w-3 md:h-3 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs">•</span>
+                                Accommodation & Facilities
+                                </h4>
+                                <ul className="list-disc pl-5 sm:pl-6 md:pl-8 text-neutral-700 space-y-0.5 sm:space-y-1 md:space-y-2 text-2xs sm:text-xs md:text-sm">
+                                  <li>Shared, simple, and clean accommodation is provided in line with yogic and ashram traditions.</li>
+                                  <li>Participants should bring their own toiletries, towel, and light bedding (if needed).</li>
+                                  <li>Hot water availability may be limited. Use water mindfully.</li>
+                                </ul>
+                              </div>
+
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                <span className="bg-secondary text-white p-0.5 rounded-full w-2 h-2 sm:w-2 sm:h-2 md:w-3 md:h-3 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs">•</span>
+                                Food & Diet
+                                </h4>
+                                <ul className="list-disc pl-5 sm:pl-6 md:pl-8 text-neutral-700 space-y-0.5 sm:space-y-1 md:space-y-2 text-2xs sm:text-xs md:text-sm">
+                                  <li>Only pure sattvic vegetarian meals will be served. Outside food is not permitted.</li>
+                                  <li>Kindly inform us in advance about any allergies or special dietary needs.</li>
+                                </ul>
+                              </div>
+
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                <span className="bg-secondary text-white p-0.5 rounded-full w-2 h-2 sm:w-2 sm:h-2 md:w-3 md:h-3 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs">•</span>
+                                Retreat Etiquette
+                                </h4>
+                                <ul className="list-disc pl-5 sm:pl-6 md:pl-8 text-neutral-700 space-y-0.5 sm:space-y-1 md:space-y-2 text-2xs sm:text-xs md:text-sm">
+                                  <li>Participants are expected to attend all sessions punctually and attentively.</li>
+                                  <li>Maintain silence during meditative and reflective sessions.</li>
+                                  <li>Minimize mobile phone usage. Embrace this digital detox.</li>
+                                  <li>Alcohol, tobacco, and any intoxicants are strictly prohibited.</li>
+                                  <li>Wear modest, comfortable clothing — preferably Indian or light-colored attire.</li>
+                                </ul>
+                              </div>
+
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                <span className="bg-secondary text-white p-0.5 rounded-full w-2 h-2 sm:w-2 sm:h-2 md:w-3 md:h-3 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs">•</span>
+                                  Respect for Nature
+                                </h4>
+                                <ul className="list-disc pl-5 sm:pl-6 md:pl-8 text-neutral-700 space-y-0.5 sm:space-y-1 md:space-y-2 text-2xs sm:text-xs md:text-sm">
+                                  <li>The retreat is held in a pristine, natural setting. Please do not litter and avoid disturbing local flora and fauna.</li>
+                                  <li>Refrain from using single-use plastics. Bring a refillable water bottle.</li>
+                                </ul>
+                              </div>
+
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                <span className="bg-secondary text-white p-0.5 rounded-full w-2 h-2 sm:w-2 sm:h-2 md:w-3 md:h-3 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs">•</span>
+                                  Medical & Emergency
+                                </h4>
+                                <ul className="list-disc pl-5 sm:pl-6 md:pl-8 text-neutral-700 space-y-0.5 sm:space-y-1 md:space-y-2 text-2xs sm:text-xs md:text-sm">
+                                  <li>A basic first-aid kit will be available on-site.</li>
+                                  <li>Participants must carry their personal medications and inform the team about any chronic conditions or allergies.</li>
+                                </ul>
+                              </div>
+
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                  Consent & Responsibility
+                                </h4>
+                                <p className="text-2xs sm:text-xs md:text-sm text-neutral-700 leading-relaxed">
+                                  By registering, you agree to follow the above guidelines.
+                                  The organizers will not be liable for any loss, injury, or mishap during the retreat.
+                                </p>
+                              </div>
+
+                              <div className="rounded-lg bg-accent/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-accent mb-1 sm:mb-2 flex items-center">
+                                <span className="bg-secondary text-white p-0.5 rounded-full w-2 h-2 sm:w-2 sm:h-2 md:w-3 md:h-3 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs">•</span>
+                                  Packing Checklist
+                                </h4>
+                                <ul className="list-disc pl-5 sm:pl-6 md:pl-8 text-neutral-700 space-y-0.5 sm:space-y-1 md:space-y-2 text-2xs sm:text-xs md:text-sm grid grid-cols-2 md:grid-cols-2 gap-x-2 sm:gap-x-3">
+                                  <li>Comfortable yoga clothing</li>
+                                  <li>Towel & personal hygiene kit</li>
+                                  <li>Water bottle, flashlight</li>
+                                  <li>Light shawl/jacket</li>
+                                  <li>Notebook and pen</li>
+                                  <li>Valid ID and receipt</li>
+                                  <li>Google Maps location (if driving)</li>
+                                  <li>Umbrella or raincoat</li>
+                                </ul>
+                              </div>
+
+                              <div className="rounded-lg bg-secondary/5 p-2 sm:p-3 md:p-5">
+                                <h4 className="text-sm sm:text-base md:text-lg font-semibold text-secondary mb-1 sm:mb-2 flex items-center">
+                                <span className="bg-secondary text-white p-0.5 rounded-full w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 inline-flex justify-center items-center mr-1.5 sm:mr-2 text-2xs sm:text-xs"> <FaPhone /></span>
+                                  For Any Assistance
+                                </h4>
+                                <p className="text-2xs sm:text-xs md:text-sm text-neutral-700">
+                                  Contact: <a href="tel:8510017177" className="text-secondary font-medium">8510017177</a><br />
+                                  Email: <a href="mailto:mail2movingworld@gmail.com" className="text-secondary font-medium">mail2movingworld@gmail.com</a>
+                                </p>
+                              </div>
+
+                              <div className="pt-2 sm:pt-3 md:pt-5 border-t border-neutral-200">
+                                <label className="flex items-start cursor-pointer bg-white p-2 sm:p-3 rounded-lg border border-neutral-200 hover:border-secondary/50 transition-all">
+                                  <input
+                                    type="checkbox"
+                                    checked={termsAccepted}
+                                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                                    className="mt-0.5 sm:mt-1 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-secondary border-gray-300 rounded focus:ring-secondary"
+                                  />
+                                  <span className="ml-2 sm:ml-3 text-2xs sm:text-xs md:text-sm text-neutral-700">
+                                    I have read and agree to all the above guidelines and understand that
+                                    by proceeding with the payment of ₹199, I am confirming my registration for the Sanjeevani workshop.
+                                    This amount is non-refundable but will be adjusted in the final payment.
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-2 p-3 sm:p-4 bg-white border-t border-neutral-200 sticky bottom-0 shrink-0 mt-auto">
+                        <button
+                          type="button"
+                          onClick={() => setShowGuidelines(false)}
+                          className="px-3 sm:px-4 md:px-6 py-2 md:py-3 text-2xs sm:text-xs md:text-sm rounded-lg border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors"
+                        >
+                          <span className="flex items-center justify-center">
+                            <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-1 sm:mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Back
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={!termsAccepted || isSubmitting}
+                          onClick={handlePayment}
+                          className={`px-3 sm:px-4 md:px-6 py-2 md:py-3 rounded-lg bg-secondary text-white text-2xs sm:text-xs md:text-sm font-medium hover:bg-secondary/90 transition-colors flex-1 flex items-center justify-center ${!termsAccepted || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-1 sm:mr-1.5 h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              Proceed to Payment
+                              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 ml-1 sm:ml-1.5 md:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                              </svg>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </div>
 
             </motion.div>

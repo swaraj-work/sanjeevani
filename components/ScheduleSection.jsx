@@ -75,38 +75,38 @@ const ScheduleSection = () => {
           <div className="flex rounded-lg overflow-hidden border border-primary/20 mb-6">
             <button
               onClick={() => setActiveDay(1)}
-              className={`flex-1 py-3 px-4 text-center font-medium transition-all ${activeDay === 1 ? 'bg-primary text-white' : 'bg-white text-primary hover:bg-primary/5'}`}
+              className={`flex-1 py-3 px-4 text-center font-medium transition-all ${activeDay === 1 ? 'bg-secondary text-white' : 'bg-white text-secondary hover:bg-primary/5'}`}
             >
               Day 1
             </button>
             <button
               onClick={() => setActiveDay(2)}
-              className={`flex-1 py-3 px-4 text-center font-medium transition-all ${activeDay === 2 ? 'bg-secondary text-white' : 'bg-white text-secondary hover:bg-secondary/5'}`}
+              className={`flex-1 py-3 px-4 text-center font-medium transition-all ${activeDay === 2 ? 'bg-primary text-white' : 'bg-white text-primary hover:bg-secondary/5'}`}
             >
               Day 2
             </button>
             <button
               onClick={() => setActiveDay(3)}
-              className={`flex-1 py-3 px-4 text-center font-medium transition-all ${activeDay === 3 ? 'bg-secondary text-white' : 'bg-white text-secondary hover:bg-secondary/5'}`}
+              className={`flex-1 py-3 px-4 text-center font-medium transition-all ${activeDay === 3 ? 'bg-secondary  text-white' : 'bg-white text-secondary hover:bg-secondary/5'}`}
             >
               Day 3
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/*Day 1 */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeIn}
-            className={`bg-white rounded-xl shadow-soft overflow-hidden ${activeDay === 1 ? 'lg:block hidden' : ''}`}
+            className={`bg-white rounded-xl shadow-soft overflow-hidden ${activeDay === 1 ? 'block' : 'lg:block hidden'}`}
           >
-            <div className="bg-primary text-white p-5 md:p-6">
+            <div className="bg-secondary text-white p-5 md:p-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl md:text-2xl font-bold">Day 1: Pravesh – Arrival & Orientation</h3>
-                <span className="bg-white text-primary text-sm font-bold px-3 py-1 rounded-full">11 Oct</span>
+                <span className="bg-white text-secondary text-sm font-bold px-3 py-1 text-center rounded-full">11 Oct</span>
               </div>
             </div>
             <div className="p-5 md:p-6">
@@ -117,8 +117,7 @@ const ScheduleSection = () => {
                 {scheduleData.day1.map((item, index) => (
                   <motion.li key={index} variants={fadeIn} className="flex flex-col md:flex-row border-b border-neutral-100 pb-4">
                     <div className="flex-1">
-                      <h4 className="font-semibold text-neutral-800">{item.event}</h4>
-                      <p className="text-sm text-neutral-600 mt-1">{item.description}</p>
+                      <p className="text-base font-semibold text-neutral-800 mt-1">{item.description}</p>
                     </div>
                   </motion.li>
                 ))}
@@ -131,12 +130,12 @@ const ScheduleSection = () => {
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeIn}
-            className={`bg-white rounded-xl shadow-soft overflow-hidden ${activeDay === 2 ? 'lg:block hidden' : ''}`}
+            className={`bg-white rounded-xl shadow-soft overflow-hidden ${activeDay === 2 ? 'block' : 'lg:block hidden'}`}
           >
             <div className="bg-primary text-white p-5 md:p-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl md:text-2xl font-bold">Day 2: Swāsthya – Returning to Health</h3>
-                <span className="bg-white text-primary text-sm font-bold px-3 py-1 rounded-full">11 Oct</span>
+                <span className="bg-white text-primary text-sm font-bold px-3 py-1 text-center rounded-full">12 Oct</span>
               </div>
             </div>
             <div className="p-5 md:p-6">
@@ -144,7 +143,7 @@ const ScheduleSection = () => {
                 className="space-y-6"
                 variants={staggerItems}
               >
-                {scheduleData.day1.map((item, index) => (
+                {scheduleData.day2.map((item, index) => (
                   <motion.li key={index} variants={fadeIn} className="flex flex-col md:flex-row border-b border-neutral-100 pb-4">
                     <div className="flex-1">
                       <h4 className="font-semibold text-neutral-800">{item.event}</h4>
@@ -162,12 +161,12 @@ const ScheduleSection = () => {
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
             variants={fadeIn}
-            className={`bg-white rounded-xl shadow-soft overflow-hidden ${activeDay === 3 ? 'lg:block hidden' : ''}`}
+            className={`bg-white rounded-xl shadow-soft overflow-hidden ${activeDay === 3 ? 'block' : 'lg:block hidden'}`}
           >
             <div className="bg-secondary text-white p-5 md:p-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl md:text-2xl font-bold">Day 3: Jeevanam – Awakening Life</h3>
-                <span className="bg-white text-secondary text-sm font-bold px-3 py-1 rounded-full">12 Oct</span>
+                <span className="bg-white text-secondary text-sm font-bold px-3 py-1 text-center rounded-full">13 Oct</span>
               </div>
             </div>
             <div className="p-5 md:p-6">
@@ -175,7 +174,7 @@ const ScheduleSection = () => {
                 className="space-y-6"
                 variants={staggerItems}
               >
-                {scheduleData.day2.map((item, index) => (
+                {scheduleData.day3.map((item, index) => (
                   <motion.li key={index} variants={fadeIn} className="flex flex-col md:flex-row border-b border-neutral-100 pb-4">
                     <div className="flex-1">
                       <h4 className="font-semibold text-neutral-800">{item.event}</h4>

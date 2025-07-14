@@ -100,6 +100,37 @@
     .card-hover {
         @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-medium;
     }
+    
+    /* Custom scrollbar styling */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary) #f1f1f1;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 10px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #764c25;
+    }
+    
+    /* Mobile version - thinner scrollbar */
+    @media (max-width: 640px) {
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+    }
 }
 
 @layer utilities {

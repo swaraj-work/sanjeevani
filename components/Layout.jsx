@@ -125,8 +125,8 @@ const Header = () => {
                     </Link>
                 </motion.div>
 
-                {/* Mobile menu button */}
-                <div className="block md:hidden relative z-20">
+                {/* Mobile/Tablet menu button */}
+                <div className="block lg:hidden relative z-20">
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Toggle menu"
@@ -144,8 +144,8 @@ const Header = () => {
                     </button>
                 </div>
 
-                {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+                {/* Desktop Navigation (only visible on large screens) */}
+                <nav className="hidden lg:flex items-center space-x-1 lg:space-x-2">
                     {[
                         { name: 'Home', href: '#home', id: 'home' },
                         { name: 'About', href: '#about', id: 'about' },
@@ -207,13 +207,13 @@ const Header = () => {
                 </nav>
             </div>
 
-            {/* Mobile Navigation */}
+            {/* Mobile/Tablet Navigation Slide-in Menu */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <>
                         {/* Backdrop */}
                         <motion.div
-                            className="fixed inset-0 bg-black/50 z-10 md:hidden"
+                            className="fixed inset-0 bg-black/50 z-10 lg:hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -226,7 +226,7 @@ const Header = () => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: '100%' }}
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="fixed top-0 right-0 bottom-0 w-4/5 max-w-sm bg-white shadow-xl z-20 md:hidden flex flex-col"
+                            className="fixed top-0 right-0 bottom-0 w-4/5 max-w-sm bg-white shadow-xl z-20 lg:hidden flex flex-col"
                         >
                             <div className="flex justify-between items-center p-5 border-b border-neutral-100">
                                 <span className="text-xl font-bold text-primary flex items-center">
@@ -272,7 +272,7 @@ const Header = () => {
                                                     <svg className={`w-5 h-5 mr-3 ${isActive ? 'text-primary' : 'text-neutral-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path>
                                                     </svg>
-                                                    {item.name}
+                                                    {item.name == 'Speakers' ? 'Guides' : item.name}
                                                     {isActive && (
                                                         <span className="ml-auto">
                                                             <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -309,35 +309,34 @@ const Header = () => {
 
 const Footer = () => {
     return (
-        <footer className="bg-gradient-to-b from-neutral-800 to-neutral-900 text-white pt-16 pb-8">
+        <footer className="bg-gradient-to-b from-neutral-800 to-neutral-900 text-white pt-10 sm:pt-12 md:pt-16 pb-6 sm:pb-8">
             <div className="container-custom">
                 {/* Main Footer Content */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-y-10 gap-x-[100px] pb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-y-8 sm:gap-y-10 gap-x-4 sm:gap-x-6 lg:gap-x-8 pb-8 sm:pb-10 md:pb-12">
                     {/* Brand Column */}
-                    <div className="md:col-span-4 space-y-6">
-                        <div className="flex items-center space-x-3 ml-5">
+                    <div className="sm:col-span-2 lg:col-span-4 space-y-4 sm:space-y-6 px-4 sm:px-0">
+                        <div className="flex items-center justify-start">
                             <img
                                 src="/images/logo-light.png"
                                 alt="Sanjeevani Logo"
-                                className="h-10 w-auto scale-[1.5]"
+                                className="h-8 sm:h-10 w-auto max-w-[200px]"
                             />
                         </div>
 
-                        <p className="text-gray-300 leading-relaxed mt-4">
+                        <p className="text-gray-300 text-sm sm:text-base leading-relaxed mt-2 sm:mt-4 text-left">
                             Follow the Path of Sanjeevani. Return not just healthier, but transformed through the ancient wisdom of Ayurveda and holistic wellness.
                         </p>
 
-                        <div className="flex space-x-4 pt-2">
+                        <div className="flex space-x-4 pt-2 justify-start">
                             {[
                                 { name: 'facebook', icon: 'M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.588157385z', url: 'https://www.facebook.com/people/Movin-W/pfbid02uEeEcjJzV4JECvM8tPeqtL1mjqChJT2YC5tF5nx4aPcih9RS7DSYAhB1NFF8qJPDl/?mibextid=wwXIfr&rdid=bU5DIHrpo2CGwmpg&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F193Hb75Sof%2F%3Fmibextid%3DwwXIfr' },
                                 { name: 'instagram', icon: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z', url: 'https://www.instagram.com/movingworld_official/' },
-                                // { name: 'x', icon: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z', url: '#'},
                                 { name: 'linkedin', icon: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z', url: 'https://www.linkedin.com/in/moving-world-355975370/'}
                             ].map((item) => (
                                 <a
                                     key={item.name}
                                     href={item.url}
-                                    className="w-9 h-9 rounded-full bg-neutral-700 hover:bg-accent flex items-center justify-center transition-colors duration-300"
+                                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-neutral-700 hover:bg-accent flex items-center justify-center transition-colors duration-300"
                                     aria-label={item.name}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -351,18 +350,18 @@ const Footer = () => {
                     </div>
 
                     {/* Quick Links Column */}
-                    <div className="md:col-span-2 space-y-6">
-                        <h4 className="text-lg font-semibold text-white relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-accent">
+                    <div className="sm:col-span-1 lg:col-span-2 space-y-4 sm:space-y-6 px-4 sm:px-0">
+                        <h4 className="text-base sm:text-lg font-semibold text-white relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-accent text-left">
                             Quick Links
                         </h4>
-                        <ul className="space-y-3">
+                        <ul className="space-y-2 sm:space-y-3 flex flex-col items-start">
                             {['About', 'Schedule', 'Speakers', 'Venue', 'Registration'].map((item) => (
                                 <li key={item}>
                                     <a
                                         href={`#${item.toLowerCase()}`}
-                                        className="text-gray-300 hover:text-accent transition-colors duration-300 flex items-center"
+                                        className="text-gray-300 hover:text-accent transition-colors duration-300 flex items-center text-sm sm:text-base"
                                     >
-                                        <svg className="w-3 h-3 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                             <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                                         </svg>
                                         {item}
@@ -373,73 +372,73 @@ const Footer = () => {
                     </div>
 
                     {/* Contact Column */}
-                    <div className="md:col-span-3 space-y-6">
-                        <h4 className="text-lg font-semibold text-white relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-accent">
+                    <div className="sm:col-span-1 lg:col-span-3 space-y-4 sm:space-y-6 px-4 sm:px-0">
+                        <h4 className="text-base sm:text-lg font-semibold text-white relative pb-2 after:absolute after:bottom-0 after:left-0 sm:after:left-0 after:right-100 sm:after:right-auto after:mx-auto sm:after:mx-0 after:w-12 after:h-0.5 after:bg-accent text-left">
                             Contact Us
                         </h4>
-                        <ul className="space-y-4">
-                            <li className="flex items-start">
-                                <div className="mt-1 mr-3 w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                        <ul className="space-y-3 sm:space-y-4">
+                            <li className="flex flex-row items-start justify-start space-x-2">
+                                <div className="mb-2 sm:mb-0 sm:mt-1 sm:mr-3 w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
                                 </div>
-                                <div>
-                                    <p className="text-white font-medium">Location</p>
-                                    <p className="text-gray-300">Solan, Himachal Pradesh</p>
+                                <div className="text-left">
+                                    <p className="text-white font-medium text-sm sm:text-base">Location</p>
+                                    <p className="text-gray-300 text-xs sm:text-sm">Solan, Himachal Pradesh</p>
                                 </div>
                             </li>
-                            <li className="flex items-start">
-                                <div className="mt-1 mr-3 w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                            <li className="flex flex-row items-start justify-start space-x-2">
+                                <div className="mb-2 sm:mb-0 sm:mt-1 sm:mr-3 w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                     </svg>
                                 </div>
-                                <div>
-                                    <p className="text-white font-medium">Email</p>
-                                    <a href="mailto:info@sanjeevaniworkshop.com" className="text-gray-300 hover:text-accent transition-colors">mail2movingworld@gmail.com</a>
+                                <div className="text-left">
+                                    <p className="text-white font-medium text-sm sm:text-base">Email</p>
+                                    <a href="mailto:mail2movingworld@gmail.com" className="text-gray-300 hover:text-accent transition-colors text-xs sm:text-sm">mail2movingworld@gmail.com</a>
                                 </div>
                             </li>
-                            <li className="flex items-start">
-                                <div className="mt-1 mr-3 w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                            <li className="flex flex-row items-start justify-start space-x-2">
+                                <div className="mb-2 sm:mb-0 sm:mt-1 sm:mr-3 w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                     </svg>
                                 </div>
-                                <div>
-                                    <p className="text-white font-medium">Phone</p>
-                                    <a href="tel:+919876543210" className="text-gray-300 hover:text-accent transition-colors">+91 85100-17177</a>
+                                <div className="text-left">
+                                    <p className="text-white font-medium text-sm sm:text-base">Phone</p>
+                                    <a href="tel:+918510017177" className="text-gray-300 hover:text-accent transition-colors text-xs sm:text-sm">+91 85100-17177</a>
                                 </div>
                             </li>
                         </ul>
                     </div>
 
                     {/* Organised By Column */}
-                    <div className="md:col-span-3 space-y-6">
-                        <h4 className="text-lg font-semibold text-white relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-12 after:h-0.5 after:bg-accent">
+                    <div className="sm:col-span-2 lg:col-span-3 space-y-4 sm:space-y-6 px-4 sm:px-0">
+                        <h4 className="text-base sm:text-lg font-semibold text-white relative pb-2 after:absolute after:bottom-0 after:left-0 sm:after:left-0 after:right-100 sm:after:right-auto after:mx-auto sm:after:mx-0 after:w-12 after:h-0.5 after:bg-accent text-left">
                             Organised By
                         </h4>
-                        <div className="flex flex-col">
-                            <div className="bg-white rounded-lg shadow-lg w-36 h-36 flex items-center justify-center mb-4 p-0">
+                        <div className="flex flex-col items-start">
+                            <div className="bg-white rounded-lg shadow-lg w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center mb-3 sm:mb-4 p-0">
                                 <img
                                     src="/images/moving-world.jpg"
                                     alt="Moving World Logo"
                                     className="max-w-full max-h-full object-cover scale-100 origin-center rounded-lg"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <p className="text-white font-medium">Moving World, New Delhi</p>
-                                <p className="text-gray-400 text-sm">in association with</p>
-                                <p className="text-gray-300">Sewa Shikshan Sansthan, Solan, Himachal Pradesh</p>
+                            <div className="space-y-1 sm:space-y-2 text-left">
+                                <p className="text-white font-medium text-sm sm:text-base">Moving World, New Delhi</p>
+                                <p className="text-gray-400 text-xs sm:text-sm">in association with</p>
+                                <p className="text-gray-300 text-xs sm:text-sm">Sewa Shikshan Sansthan, Solan, Himachal Pradesh</p>
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-3 sm:mt-4 text-left">
                                 <a
                                     href="#registration"
-                                    className="inline-flex items-center text-accent hover:text-white transition-colors duration-300"
+                                    className="inline-flex items-center text-accent hover:text-white transition-colors duration-300 text-sm sm:text-base"
                                 >
                                     <span>Register for the Workshop</span>
-                                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                     </svg>
                                 </a>
@@ -449,15 +448,15 @@ const Footer = () => {
                 </div>
 
                 {/* Footer Bottom */}
-                <div className="pt-8 border-t border-neutral-700">
-                    <div className="flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-gray-400 text-sm mb-4 md:mb-0">
+                <div className="pt-6 sm:pt-8 border-t border-neutral-700">
+                    <div className="flex flex-col sm:flex-row justify-between items-center">
+                        <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-0 text-center sm:text-left">
                             &copy; {new Date().getFullYear()} Sanjeevani Workshop. All rights reserved.
                         </p>
-                        <div className="flex space-x-6">
-                            <a href="#" className="text-gray-400 hover:text-accent text-sm transition-colors">Privacy Policy</a>
-                            <a href="#" className="text-gray-400 hover:text-accent text-sm transition-colors">Terms of Service</a>
-                            <a href="#" className="text-gray-400 hover:text-accent text-sm transition-colors">FAQ</a>
+                        <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6">
+                            <a href="#" className="text-gray-400 hover:text-accent text-xs sm:text-sm transition-colors">Privacy Policy</a>
+                            <a href="#" className="text-gray-400 hover:text-accent text-xs sm:text-sm transition-colors">Terms of Service</a>
+                            <a href="#" className="text-gray-400 hover:text-accent text-xs sm:text-sm transition-colors">FAQ</a>
                         </div>
                     </div>
                 </div>
