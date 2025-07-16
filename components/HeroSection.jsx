@@ -299,13 +299,12 @@ const HeroSection = () => {
           </div>
 
           {/* White Card - Overlapping from bottom */}
-          <div className="relative w-[150vw] ml-[-25vw] mt-[-35vh] flex justify-center">
+          <div className="relative flex justify-center mt-[-35vh] w-[200vw] ml-[-50vw] sm:w-[500vw] sm:ml-[-200vw] md:w-[600vw] md:ml-[-250vw]">
             <motion.div
-              className="bg-white rounded-t-[50%] border-[#d0e49b] border-t-8 shadow-2xl px-6 pt-8 pb-8 mx-auto"
+              className="bg-white rounded-t-[50%] border-[#d0e49b] border-t-8 shadow-2xl px-[5%] py-8 sm:px-[2%] mx-auto max-w-[640px] sm:max-w-[768px] md:max-w-[1024px]"
               style={{
                 marginTop: '-40px',
-                width: 'calc(100% - 20px)',
-                maxWidth: '600px'
+                width: 'calc(100% - 25%)',
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
