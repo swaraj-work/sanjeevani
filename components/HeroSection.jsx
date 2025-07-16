@@ -22,7 +22,7 @@ const HeroSection = () => {
       setWindowWidth(window.innerWidth);
       // Detect desktop mode on small screen (if width is > 992px but physical viewport is smaller)
       const isSmallScreenDesktopMode = window.innerWidth > 992 &&
-        (window.screen.width < 768 || window.visualViewport.width < 768);
+        (window.screen.width < 768 || window.visualViewport?.width < 768);
       setIsDesktopMode(isSmallScreenDesktopMode);
     };
 
@@ -274,31 +274,39 @@ const HeroSection = () => {
 
       {/* Mobile Layout - Only show if not in desktop mode */}
       {!isDesktopMode && (
-        <div className="lg:hidden relative h-[125vh]">
-          {/* Background Image */}
-          <div className="absolute inset-0 mb-[40vh] md:mb-[45vh]">
-            {images.map((image, index) => (
-              <div
-                key={index}
-                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-                  }`}
-              >
-                <Image
-                  src={image}
-                  alt={`Carousel Image ${index + 1}`}
-                  fill
-                  className="object-cover scale-100"
-                  style={{ objectPosition: 'top' }}
-                  priority={index === 0}
-                />
-              </div>
-            ))}
+        <div className="lg:hidden relative">
+          {/* Background Image Carousel - Full height */}
+          <div className="relative z-0 overflow-hidden w-full h-full">
+            <div className="relative h-screen w-full overflow-hidden">
+              {images.map((src, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-0 transition-all duration-500 ${currentImageIndex === index ? "opacity-100 z-10" : "opacity-0 z-0"
+                    }`}
+                >
+                  <Image
+                    src={src}
+                    alt={`Carousel Image ${index + 1}`}
+                    fill
+                    className="w-full h-auto object-cover"
+                    style={{ objectPosition: 'center top' }}
+                    priority={index === 0}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
           </div>
 
-          {/* White Card Container */}
-          <div className="relative top-[27vh] z-10 px-4 ml-[-1rem] mr-[-1rem] flex flex-col justify-end items-center min-h-screen">
+          {/* White Card - Overlapping from bottom */}
+          <div className="relative w-[150vw] ml-[-25vw] mt-[-35vh] flex justify-center">
             <motion.div
-              className="bg-white rounded-t-[50%] border-[#d0e49b] border-t-[5px] px-[30vw] w-[150vw] shadow-2xl p-6 mb-3"
+              className="bg-white rounded-t-[50%] border-[#d0e49b] border-t-8 shadow-2xl px-6 pt-8 pb-8 mx-auto"
+              style={{
+                marginTop: '-40px',
+                width: 'calc(100% - 20px)',
+                maxWidth: '600px'
+              }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -308,36 +316,37 @@ const HeroSection = () => {
                 variants={item}
                 initial="hidden"
                 animate="show"
-                className="flex justify-center mb-6 mt-2"
+                className="flex justify-center mb-4"
               >
-                <div className="relative w-48 h-16">
+                <div className="relative w-40 h-12 sm:w-48 sm:h-16">
                   <Image
                     src="/images/logo.png"
                     alt="Sanjeevani Logo"
                     fill
-                    className="object-contain"
+                    className="object-contain "
+                    priority
                   />
                 </div>
               </motion.div>
 
               {/* Main Content */}
               <motion.div
-                className="text-center"
+                className="text-center px-20"
                 variants={container}
                 initial="hidden"
                 animate="show"
               >
-                <motion.div variants={item} className="space-y-4">
-                  <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+                <motion.div variants={item} className="space-y-3 sm:space-y-4">
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
                     Rediscovering Health & Harmony
                   </h1>
-                  <h2 className="text-xl font-bold text-[#8a9c4a] mb-2">
+                  <h2 className="text-lg sm:text-xl font-bold text-[#8a9c4a]">
                     The Vedic Way of Living
                   </h2>
-                  <p className="text-gray-700">
+                  <p className="text-sm sm:text-base text-gray-700">
                     A Transformational Wellness Retreat with
                   </p>
-                  <div className="inline-block bg-[#d0e49b] text-gray-900 px-4 py-2 rounded-full text-sm font-semibold">
+                  <div className="inline-block bg-[#d0e49b] text-gray-900 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold">
                     Vaidya Rajesh Kapoor
                   </div>
                 </motion.div>
@@ -345,28 +354,33 @@ const HeroSection = () => {
                 {/* Info bar */}
                 <motion.div
                   variants={item}
-                  className="bg-gray-700 text-white rounded-xl p-3 mt-6"
+                  className="bg-gray-700 text-white rounded-lg p-3 mt-4 sm:mt-6"
                 >
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="px-5">
-                      <p className="text-lime-400 font-semibold text-xs mb-1">Location</p>
-                      <p className="text-sm">Solan, HP</p>
+                  <div className="grid grid-cols-3 gap-1 sm:gap-2 text-center text-xs sm:text-sm">
+                    <div>
+                      <p className="text-lime-400 font-semibold mb-1">Location</p>
+                      <p>Solan, HP</p>
                     </div>
-                    <div className="px-3">
-                      <p className="text-lime-400 font-semibold text-xs mb-1">Dates</p>
-                      <p className="text-sm">10-12 Oct 2025</p>
+                    <div>
+                      <p className="text-lime-400 font-semibold mb-1">Dates</p>
+                      <p>10-12 Oct 2025</p>
                     </div>
-                    <div className="px-5">
-                      <p className="text-lime-400 font-semibold text-xs mb-1">Format</p>
-                      <p className="text-sm text-right">Residential Workshop</p>
+                    <div>
+                      <p className="text-lime-400 font-semibold mb-1">Format</p>
+                      <p>Residential</p>
                     </div>
                   </div>
                 </motion.div>
               </motion.div>
-              <div className="flex mt-10 flex-col space-y-3">
+
+              {/* CTA Buttons */}
+              <motion.div
+                variants={item}
+                className="flex flex-col px-20 space-y-3 sm:space-y-4 mt-6 sm:mt-8"
+              >
                 <motion.a
                   href="#registration"
-                  className="bg-[#d0e49b] hover:bg-lime-300 text-gray-900 px-6 py-3 rounded-full text-center font-semibold transition-all duration-300 shadow-md"
+                  className="bg-[#d0e49b] hover:bg-lime-300 text-gray-900 px-4 py-3 sm:px-6 sm:py-3 rounded-full text-center text-sm sm:text-base font-semibold transition-all duration-300 shadow-md"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -374,7 +388,7 @@ const HeroSection = () => {
                 </motion.a>
                 <motion.a
                   href="#about"
-                  className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-6 py-3 rounded-full text-center font-semibold transition-all duration-300"
+                  className="border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-4 py-3 sm:px-6 sm:py-3 rounded-full text-center text-sm sm:text-base font-semibold transition-all duration-300"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -383,7 +397,7 @@ const HeroSection = () => {
 
                 {/* Seats left badge - Mobile */}
                 <motion.div
-                  className="flex justify-center mt-5"
+                  className="flex justify-center mt-4 sm:mt-5 mb-2"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{
@@ -393,12 +407,12 @@ const HeroSection = () => {
                     delay: 1.2
                   }}
                 >
-                  <div className="bg-red-600 text-white px-4 py-1.5 rounded-full inline-flex items-center text-sm font-bold shadow-lg">
-                    <span className="inline-block h-3 w-3 bg-white rounded-full animate-pulse mr-2"></span>
+                  <div className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-1.5 rounded-full inline-flex items-center text-xs sm:text-sm font-bold shadow-lg">
+                    <span className="inline-block h-2 w-2 sm:h-3 sm:w-3 bg-white rounded-full animate-pulse mr-1 sm:mr-2"></span>
                     Only 60 seats left
                   </div>
                 </motion.div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </div>
