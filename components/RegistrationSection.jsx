@@ -667,7 +667,7 @@ const RegistrationSection = () => {
               variants={staggerContainer}
               className="lg:col-span-5 space-y-8 flex flex-col justify-between"
             >
-              <motion.div variants={fadeIn} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-neutral-100">
+              {/* <motion.div variants={fadeIn} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-neutral-100">
                 <div className="bg-primary/5 p-5 border-b border-neutral-100">
                   <h3 className="text-xl font-bold text-primary">Registration Fee (INR)</h3>
                 </div>
@@ -747,7 +747,7 @@ const RegistrationSection = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </motion.div> */}
 
               <motion.div variants={fadeIn} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-neutral-100">
                 <div className="bg-primary/5 p-5 border-b border-neutral-100">

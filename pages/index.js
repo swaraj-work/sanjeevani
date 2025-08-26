@@ -127,7 +127,7 @@ export default function Home() {
             <div className="w-full overflow-x-hidden">
                 <HeroSection />
                 <AboutSection />
-                <ScheduleSection />
+                {/* <ScheduleSection /> */}
                 <SpeakerSection />
                 <VenueSection />
                 <RegistrationSection />
